@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import "./styles.css";
 import { Button, Table } from "antd";
-import { EmployeeType, getEmployees } from "../../services/employees";
+import { EmployeeType, useGetEmployees } from "../../services/employees";
 import ModalAddEmployee from "./components/ModalAddEmployee";
 
 const columns = [
@@ -11,28 +11,10 @@ const columns = [
 ];
 
 const EmployeesPage = () => {
-  const [employees, setEmployees] = useState([] as EmployeeType[]);
   const [visible, setVisible] = useState(false);
 
-  useEffect(() => {
-    fetchEmployees();
-  }, []);
-
-  const handleAddEmployees = useCallback(
-    (employee: EmployeeType) => {
-      setEmployees([...employees, employee]);
-    },
-    [employees]
-  );
-
-  const fetchEmployees = async () => {
-    try {
-      const data: EmployeeType[] = await getEmployees();
-      setEmployees(data);
-    } catch (err) {
-      console.log("err", err.message);
-    }
-  };
+  //services
+  const { data, isLoading } = useGetEmployees();
 
   return (
     <div className="employees-page">
@@ -43,15 +25,12 @@ const EmployeesPage = () => {
       </div>
       <Table
         rowKey="id"
-        dataSource={employees}
+        dataSource={data}
         columns={columns}
         pagination={{ defaultPageSize: 5 }}
+        loading={isLoading}
       />
-      <ModalAddEmployee
-        visible={visible}
-        onCancel={() => setVisible(false)}
-        handleAddEmployees={handleAddEmployees}
-      />
+      <ModalAddEmployee visible={visible} onCancel={() => setVisible(false)} />
     </div>
   );
 };

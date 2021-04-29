@@ -1,4 +1,6 @@
+import { useMutation, useQuery } from "react-query";
 import axios from "./axios";
+import queryClient from "./queryClient";
 
 export interface EmployeeType {
   id: string;
@@ -7,10 +9,20 @@ export interface EmployeeType {
   position: string;
 }
 
-export const getEmployees = () => {
-  return axios.get("/employees").then((res) => res.data);
+export const useGetEmployees = () => {
+  return useQuery("employees", () =>
+    axios.get("/employees").then((res) => res.data)
+  );
 };
 
-export const addEmployees = (employees: EmployeeType) => {
-  return axios.post("/employees", employees).then((res) => res.data);
+export const useAddEmployee = () => {
+  return useMutation(
+    (employee: EmployeeType) =>
+      axios.post("/employees", employee).then((res) => res.data),
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries("employees");
+      },
+    }
+  );
 };

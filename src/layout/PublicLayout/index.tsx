@@ -1,27 +1,47 @@
 import React from "react";
 import "./styles.css";
 import { Row, Col, Button } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
+const ROUTE_PATH = {
+  COUNTER: "/counter",
+  EMPLOYEES: "/employees",
+};
+
+const ROUTES = [
+  {
+    path: ROUTE_PATH.COUNTER,
+    routeName: "Counter",
+  },
+  {
+    path: ROUTE_PATH.EMPLOYEES,
+    routeName: "Employees",
+  },
+];
 interface PublicLayoutProps {
   children: any;
 }
 
 const PublicLayout = (props: PublicLayoutProps) => {
+  const location = useLocation();
+
+  const getBtnType = (routePath: string) => {
+    return location.pathname === routePath ? "primary" : "default";
+  };
+
   return (
     <div className="app-page">
       <div className="app-page-header">
         <Row gutter={[20, 0]}>
-          <Col>
-            <Link to="/counter">
-              <Button className="app-page-btn">Counter</Button>
-            </Link>
-          </Col>
-          <Col>
-            <Link to="/employees">
-              <Button className="app-page-btn">Employees</Button>
-            </Link>
-          </Col>
+          {ROUTES.map((el) => (
+            <Col key={el.path}>
+              <Link to={el.path}>
+                <Button className="app-page-btn" type={getBtnType(el.path)}>
+                  {el.routeName}
+                </Button>
+              </Link>
+            </Col>
+          ))}
         </Row>
       </div>
       <div className="app-page-content">{props.children}</div>

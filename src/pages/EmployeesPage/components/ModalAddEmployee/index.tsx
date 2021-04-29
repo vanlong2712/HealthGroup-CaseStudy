@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Form, FormItemProps, Input, message, Modal } from "antd";
-import { addEmployees, EmployeeType } from "../../../../services/employees";
+import { EmployeeType, useAddEmployee } from "../../../../services/employees";
 
 const forms = [
   {
@@ -25,35 +25,25 @@ const forms = [
 interface ModalAddEmployeeProps {
   visible: boolean;
   onCancel: () => any;
-  handleAddEmployees: Function;
 }
 
-const ModalAddEmployee = ({
-  visible,
-  onCancel,
-  handleAddEmployees,
-}: ModalAddEmployeeProps) => {
-  const [loading, setLoading] = useState(false);
+const ModalAddEmployee = ({ visible, onCancel }: ModalAddEmployeeProps) => {
   const [form] = Form.useForm();
 
+  //services
+  const addEmployee = useAddEmployee();
+
   const handleCancel = () => {
-    if (loading) return;
     form.resetFields();
     onCancel();
   };
 
   const onFinish = (values: EmployeeType) => {
-    setLoading(true);
-    addEmployees(values)
-      .then((data) => {
-        handleAddEmployees(data);
-        message.success({ content: "Employees added successfully!" });
+    addEmployee.mutate(values, {
+      onSuccess: () => {
         handleCancel();
-      })
-      .catch((err) => console.log("err", err.message))
-      .finally(() => {
-        setLoading(false);
-      });
+      },
+    });
   };
 
   return (
@@ -64,7 +54,7 @@ const ModalAddEmployee = ({
       centered
       okText="Add"
       onOk={form.submit}
-      confirmLoading={loading}
+      confirmLoading={addEmployee.isLoading}
     >
       <Form form={form} layout="vertical" onFinish={onFinish}>
         {forms.map((el, idx) => (
