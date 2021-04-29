@@ -1,8 +1,13 @@
-import React, { useState } from "react";
-import { Form, FormItemProps, Input, message, Modal } from "antd";
-import { EmployeeType, useAddEmployee } from "../../../../services/employees";
+import React, { useEffect } from "react";
+import { Form, FormItemProps, Input, Modal } from "antd";
+import {
+  EmployeeType,
+  useAddEmployee,
+  useUpdateEmployee,
+} from "../../../../services/employees";
 
 const forms = [
+  { name: "id", hidden: true },
   {
     name: "name",
     label: "Name",
@@ -25,20 +30,44 @@ const forms = [
 interface ModalAddEmployeeProps {
   visible: boolean;
   onCancel: () => any;
+  selectedEmployee: EmployeeType;
+  setSelectedEmployee: Function;
 }
 
-const ModalAddEmployee = ({ visible, onCancel }: ModalAddEmployeeProps) => {
+const ModalAddEmployee = ({
+  visible,
+  onCancel,
+  selectedEmployee,
+  setSelectedEmployee,
+}: ModalAddEmployeeProps) => {
   const [form] = Form.useForm();
+
+  const isEdit = !!selectedEmployee.id;
 
   //services
   const addEmployee = useAddEmployee();
+  const updateEmployee = useUpdateEmployee();
+
+  useEffect(() => {
+    if (isEdit) {
+      form.setFieldsValue({ ...selectedEmployee });
+    }
+  }, [selectedEmployee]);
 
   const handleCancel = () => {
     form.resetFields();
+    setSelectedEmployee({});
     onCancel();
   };
 
   const onFinish = (values: EmployeeType) => {
+    if (isEdit) {
+      return updateEmployee.mutate(values, {
+        onSuccess: () => {
+          handleCancel();
+        },
+      });
+    }
     addEmployee.mutate(values, {
       onSuccess: () => {
         handleCancel();
@@ -48,13 +77,13 @@ const ModalAddEmployee = ({ visible, onCancel }: ModalAddEmployeeProps) => {
 
   return (
     <Modal
-      title="Add Employee"
+      title={isEdit ? "Update Employee" : "Add Employee"}
       visible={visible}
       onCancel={handleCancel}
       centered
-      okText="Add"
+      okText={isEdit ? "Update" : "Add"}
       onOk={form.submit}
-      confirmLoading={addEmployee.isLoading}
+      confirmLoading={addEmployee.isLoading || updateEmployee.isLoading}
     >
       <Form form={form} layout="vertical" onFinish={onFinish}>
         {forms.map((el, idx) => (

@@ -1,5 +1,6 @@
 .employees-page {
-  min-width: 700px;
+  width: 100%;
+  padding: 20px;
 }
 .employees-page-add-btn {
   text-align: right;
