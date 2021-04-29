@@ -2,6 +2,13 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Library used in the project
+
+antd - Ant Design - https://ant.design/components/overview/
+axios - https://github.com/axios/axios
+react-router - https://reactrouter.com/
+react-query - https://react-query.tanstack.com/
+
 ## Available Scripts
 
 In the project directory, you can run:
@@ -44,4 +51,5 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
 # HealthGroup-CaseStudy
